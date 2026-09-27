@@ -1,0 +1,9 @@
+RepoDNA build 2026.09.27-v4
+
+Included in this build:
+- Larger report typography
+- Better mobile/tablet stacking
+- Spacing between explorer panels
+- Animated buttons with reduced-motion support
+- Rate-limit reset time in the API budget badge
+- Previous scan/runtime and CORS fixes
