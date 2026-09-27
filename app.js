@@ -103,7 +103,8 @@ async function githubFetch(path, options = {}) {
   if (cached !== null) return cached;
   const response = await fetch(`${API_ROOT}${path}`, {
     ...options,
-    headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(options.headers || {}) },
+    // Keep the request CORS-simple. GitHub's public API accepts this media type without OAuth or custom headers.
+    headers: { Accept: "application/vnd.github+json", ...(options.headers || {}) },
   });
   const remaining = response.headers.get("x-ratelimit-remaining");
   if (remaining !== null) {
@@ -121,7 +122,7 @@ async function githubFetch(path, options = {}) {
 }
 
 async function githubStatsFetch(path) {
-  const response = await fetch(`${API_ROOT}${path}`, { headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } });
+  const response = await fetch(`${API_ROOT}${path}`, { headers: { Accept: "application/vnd.github+json" } });
   const remaining = response.headers.get("x-ratelimit-remaining");
   if (remaining !== null) {
     const value = Number(remaining);
@@ -223,6 +224,7 @@ async function scanRepository(parsed) {
     const repoParam = `${state.owner}/${state.name}`;
     const url = new URL(window.location.href); url.searchParams.set("repo", repoParam); history.replaceState({}, "", url);
   } catch (error) {
+    console.error("RepoDNA scan failed", error);
     if (id !== state.scanId) return;
     els.loading.hidden = true;
     showLanding();
