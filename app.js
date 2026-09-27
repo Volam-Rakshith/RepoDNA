@@ -21,6 +21,7 @@ const state = {
   manifestData: [],
   warnings: [],
   rateRemaining: null,
+  rateReset: null,
   dimensions: [],
   analysis: null,
   churn: null,
@@ -107,10 +108,12 @@ async function githubFetch(path, options = {}) {
     headers: { Accept: "application/vnd.github+json", ...(options.headers || {}) },
   });
   const remaining = response.headers.get("x-ratelimit-remaining");
+  const reset = response.headers.get("x-ratelimit-reset");
   if (remaining !== null) {
     const value = Number(remaining);
     state.rateRemaining = state.rateRemaining === null ? value : Math.min(state.rateRemaining, value);
   }
+  if (reset !== null) state.rateReset = Number(reset);
   let payload = null;
   try { payload = await response.json(); } catch { payload = null; }
   if (!response.ok) {
@@ -124,10 +127,12 @@ async function githubFetch(path, options = {}) {
 async function githubStatsFetch(path) {
   const response = await fetch(`${API_ROOT}${path}`, { headers: { Accept: "application/vnd.github+json" } });
   const remaining = response.headers.get("x-ratelimit-remaining");
+  const reset = response.headers.get("x-ratelimit-reset");
   if (remaining !== null) {
     const value = Number(remaining);
     state.rateRemaining = state.rateRemaining === null ? value : Math.min(state.rateRemaining, value);
   }
+  if (reset !== null) state.rateReset = Number(reset);
   let payload = null; try { payload = await response.json(); } catch { /* no body */ }
   if (response.status === 202) return { deferred: true, data: null };
   if (!response.ok) throw new GithubError(payload?.message || `GitHub returned HTTP ${response.status}.`, response.status, payload || {});
@@ -166,11 +171,17 @@ function openError(error) {
 function closeError() { els.errorModal.hidden = true; }
 
 function noteWarning(text) { if (!state.warnings.includes(text)) state.warnings.push(text); }
-function updateRateBadge() { $("#rate-limit-badge").textContent = state.rateRemaining === null ? "API budget —" : `API budget ${state.rateRemaining} left`; }
+function updateRateBadge() {
+  const badge = $("#rate-limit-badge");
+  if (state.rateRemaining === null) { badge.textContent = "API budget —"; badge.title = "GitHub rate-limit data was not returned."; return; }
+  const resetTime = state.rateReset ? new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit" }).format(new Date(state.rateReset * 1000)) : null;
+  badge.textContent = `API budget ${state.rateRemaining} left${resetTime ? ` · resets ${resetTime}` : ""}`;
+  badge.title = resetTime ? `GitHub's public API budget resets at ${resetTime} in your local time.` : "GitHub's public API budget is per IP and resets hourly.";
+}
 
 async function scanRepository(parsed) {
   const id = ++state.scanId;
-  Object.assign(state, { repo: null, owner: parsed.owner, name: parsed.name, tree: [], files: [], languages: {}, commits: [], contributors: [], branches: [], releases: [], tags: [], manifests: [], manifestData: [], warnings: [], rateRemaining: null, dimensions: [], analysis: null, churn: null, growth: null });
+  Object.assign(state, { repo: null, owner: parsed.owner, name: parsed.name, tree: [], files: [], languages: {}, commits: [], contributors: [], branches: [], releases: [], tags: [], manifests: [], manifestData: [], warnings: [], rateRemaining: null, rateReset: null, dimensions: [], analysis: null, churn: null, growth: null });
   showLoading();
   try {
     setLoading(1, "Opening the specimen…", "Requesting public repository metadata.", 8);
