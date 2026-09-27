@@ -1,0 +1,1 @@
+The SVG in this folder is an illustrative, repository-safe product screenshot used by the README. It contains no private repository data.

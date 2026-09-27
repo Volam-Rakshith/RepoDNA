@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#080d19" />
+  <meta name="description" content="RepoDNA — decode the DNA of any public GitHub repository." />
+  <title>RepoDNA — Decode the DNA of any repository</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="RepoDNA home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span><strong>RepoDNA</strong><small>by VR Developments</small></span>
+    </a>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="#how-it-works">Method</a>
+      <a href="https://github.com" target="_blank" rel="noreferrer">GitHub ↗</a>
+      <span class="status-pill"><span class="status-dot"></span>public scan / local first</span>
+    </nav>
+  </header>
+
+  <main>
+    <section id="landing" class="landing shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span>REPOSITORY INTELLIGENCE / 01</div>
+        <h1 id="hero-title">Put a repository<br /><em>under the microscope.</em></h1>
+        <p class="hero-lede">RepoDNA reads the structure, stack, habits, and evolution of a public GitHub repository — then turns the evidence into a profile you can actually interrogate.</p>
+        <form id="scan-form" class="scan-form" novalidate>
+          <label for="repo-input" class="sr-only">GitHub repository URL or owner/repository</label>
+          <div class="input-shell">
+            <span class="input-prefix">github.com /</span>
+            <input id="repo-input" name="repo" autocomplete="off" spellcheck="false" placeholder="owner / repository" aria-describedby="input-help" />
+            <button id="scan-button" type="submit"><span>Decode repository</span><b>↗</b></button>
+          </div>
+          <div class="form-foot">
+            <span id="input-help">Try <button class="text-button example-repo" type="button">vercel/next.js</button> or paste a public GitHub URL.</span>
+            <span class="privacy-note"><span class="tiny-lock">◌</span> No login · no write access · no paid APIs</span>
+          </div>
+        </form>
+        <div id="landing-error" class="inline-error" role="alert" hidden></div>
+      </div>
+      <div class="hero-visual" aria-label="Abstract repository DNA visualization" role="img">
+        <div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit orbit-c"></div>
+        <div class="hero-core"><span class="core-label">REPO<br />DNA</span><span class="core-pulse"></span></div>
+        <span class="hero-node node-a">01 <i></i></span><span class="hero-node node-b">08 <i></i></span><span class="hero-node node-c">△ <i></i></span><span class="hero-node node-d">Σ <i></i></span>
+        <div class="hero-legend"><span><i class="cyan-dot"></i>observed</span><span><i class="violet-dot"></i>calculated</span><span><i class="lime-dot"></i>inferred</span></div>
+      </div>
+      <div class="scroll-cue"><span>scroll to inspect</span><i></i></div>
+    </section>
+
+    <section id="loading" class="loading-state shell" hidden aria-live="polite">
+      <div class="loading-glyph"><span></span><span></span><span></span></div>
+      <div>
+        <div class="eyebrow">REPOSITORY INTELLIGENCE / <span id="loading-step-number">01</span></div>
+        <h2 id="loading-title">Opening the specimen…</h2>
+        <p id="loading-detail">Requesting only public repository metadata.</p>
+        <div class="loading-track"><span id="loading-progress"></span></div>
+      </div>
+      <button id="cancel-scan" class="ghost-button" type="button">Cancel</button>
+    </section>
+
+    <section id="workspace" hidden>
+      <div class="repo-bar shell">
+        <button id="new-scan" class="back-button" type="button">← <span>new scan</span></button>
+        <div class="repo-bar-title"><span class="repo-kicker">PUBLIC REPOSITORY / LIVE SNAPSHOT</span><strong id="repo-breadcrumb">—</strong></div>
+        <div class="repo-bar-actions"><span id="rate-limit-badge" class="data-badge">API budget —</span><button id="copy-share" class="icon-button" type="button" title="Copy shareable URL">↗ <span>share</span></button></div>
+      </div>
+
+      <div class="workspace-intro shell">
+        <div class="intro-main">
+          <div class="eyebrow"><span class="eyebrow-line"></span>SPECIMEN REPORT / <span id="scan-timestamp">—</span></div>
+          <div class="repo-heading-row"><div class="repo-avatar" id="repo-avatar">R</div><div><h1 id="repo-title">Repository</h1><p id="repo-description">—</p></div></div>
+          <div id="repo-chips" class="chip-row"></div>
+        </div>
+        <div class="intro-readout"><span class="readout-label">LAST PUSH</span><strong id="last-push">—</strong><span id="repo-visibility" class="readout-status">public / read-only</span></div>
+      </div>
+
+      <div class="shell warning-stack" id="warning-stack"></div>
+      <div class="shell stat-strip" id="stat-strip"></div>
+
+      <section class="shell signature-section" aria-labelledby="signature-title">
+        <div class="section-heading">
+          <div><span class="section-index">01</span><h2 id="signature-title">The repository signature</h2><p>Eight evidence-backed lenses. Hover a node for its signal; click to inspect the method.</p></div>
+          <div class="legend"><span><i class="legend-swatch observed"></i>observed</span><span><i class="legend-swatch calculated"></i>calculated</span><span><i class="legend-swatch inferred"></i>inferred</span></div>
+        </div>
+        <div class="signature-layout">
+          <div class="signature-card panel-grid">
+            <div class="signature-topline"><span>DNA PROFILE / NORMALIZED SIGNAL VIEW</span><span id="signature-scale">0 — 100 · not a quality score</span></div>
+            <div class="dna-chart-wrap"><svg id="dna-chart" viewBox="0 0 680 560" role="img" aria-labelledby="dna-chart-title dna-chart-desc"><title id="dna-chart-title">Repository DNA signature</title><desc id="dna-chart-desc">Interactive radar chart showing evidence-backed repository dimensions.</desc></svg></div>
+            <div class="chart-actions"><button id="export-png" class="outline-button" type="button">↓ PNG</button><button id="export-svg" class="outline-button" type="button">↓ SVG</button><button id="copy-share-2" class="outline-button" type="button">↗ Copy share link</button></div>
+          </div>
+          <aside class="dimension-panel" aria-label="DNA dimensions"><div class="dimension-panel-head"><span>DIMENSION READOUT</span><span id="dimension-count">08 / 08</span></div><div id="dimension-list"></div><div id="insight-drawer" class="insight-drawer"><span class="drawer-kicker">SELECT A DIMENSION</span><p>Each signal is tied to a visible input. Start with a point on the signature.</p></div></aside>
+        </div>
+      </section>
+
+      <section class="shell evidence-section" aria-labelledby="evidence-title">
+        <div class="section-heading compact"><div><span class="section-index">02</span><h2 id="evidence-title">Evidence, not vibes</h2><p>Raw observations and transparent calculations behind the signature.</p></div></div>
+        <div id="evidence-grid" class="evidence-grid"></div>
+      </section>
+
+      <section id="explorer" class="shell explorer-section" aria-labelledby="explorer-title">
+        <div class="section-heading"><div><span class="section-index">03</span><h2 id="explorer-title">Inside the specimen</h2><p>Explore the file system, composition, and signals that shaped the profile.</p></div><div class="section-meta" id="tree-meta">—</div></div>
+        <div class="explorer-grid">
+          <div class="panel tree-panel"><div class="panel-header"><div><span class="panel-kicker">STRUCTURE / FILE TREE</span><h3>Project topology</h3></div><div class="tree-tools"><span id="tree-count">—</span><input id="tree-search" type="search" placeholder="Filter paths" aria-label="Filter file paths" /></div></div><div id="file-tree" class="file-tree"></div></div>
+          <div class="side-stack"><div class="panel"><div class="panel-header"><div><span class="panel-kicker">WEIGHT / TOP 08</span><h3>Largest files</h3></div></div><div id="largest-files" class="rank-list"></div></div><div class="panel"><div class="panel-header"><div><span class="panel-kicker">COMPOSITION / BYTES</span><h3>Language mix</h3></div></div><div id="language-bars" class="language-bars"></div></div></div>
+        </div>
+        <div class="explorer-grid lower-grid"><div class="panel"><div class="panel-header"><div><span class="panel-kicker">SIGNALS / DETECTED</span><h3>Toolchain & configuration</h3></div></div><div id="signals-list" class="signal-list"></div></div><div class="panel"><div class="panel-header"><div><span class="panel-kicker">DEPENDENCIES / MANIFESTS</span><h3>Dependency surface</h3></div></div><div id="dependencies-list" class="dependency-list"></div></div></div>
+        <div class="panel churn-panel"><div class="panel-header"><div><span class="panel-kicker">CHANGE SURFACE / ON DEMAND</span><h3>Frequently changed areas</h3><p>Loaded only when requested to keep the scan light on GitHub's public API.</p></div><button id="load-churn" class="outline-button" type="button">Load file churn</button></div><div id="churn-content" class="churn-content"><div class="deferred-state"><span class="deferred-icon">⌁</span><span>Latest commit metadata is ready. Fetch commit file lists to map change hotspots.</span></div></div></div>
+      </section>
+
+      <section id="evolution" class="shell evolution-section" aria-labelledby="evolution-title">
+        <div class="section-heading"><div><span class="section-index">04</span><h2 id="evolution-title">Evolution over time</h2><p>A time-aware view of age, activity, releases, and growth — with the limits made explicit.</p></div><button id="load-growth" class="outline-button" type="button">Load growth history</button></div>
+        <div class="evolution-grid"><div class="panel timeline-panel"><div class="panel-header"><div><span class="panel-kicker">RECENT ACTIVITY / SAMPLE</span><h3>Commit pulse</h3><p id="commit-sample-note">—</p></div><div class="timeline-key"><span><i class="commit-dot"></i>commit</span><span><i class="release-dot"></i>release</span></div></div><div id="commit-timeline" class="commit-timeline"></div></div><div class="panel milestones-panel"><div class="panel-header"><div><span class="panel-kicker">MILESTONES / PUBLIC</span><h3>Repository time markers</h3></div></div><div id="milestones" class="milestones"></div></div></div>
+        <div class="panel growth-panel"><div class="panel-header"><div><span class="panel-kicker">CODE GROWTH / OPTIONAL STATS ENDPOINT</span><h3>Growth periods</h3><p>GitHub may defer historical statistics for large or active repositories. Additions and deletions are shown when available; historical file counts and language changes are not estimated.</p></div><span id="growth-status" class="data-badge">not loaded</span></div><div id="growth-chart" class="growth-chart"><div class="deferred-state"><span class="deferred-icon">⌁</span><span>Request historical additions and deletions when you want the deeper read.</span></div></div></div>
+      </section>
+
+      <section id="how-it-works" class="shell methodology-section" aria-labelledby="method-title"><div class="method-copy"><span class="section-index">05</span><h2 id="method-title">How RepoDNA reads a repository</h2><p>RepoDNA is a microscope, not a magic score. It asks GitHub for public metadata, computes a small set of reproducible metrics in your browser, and labels patterns as inference when they go beyond a raw observation.</p><a href="docs/ARCHITECTURE.md" class="text-link">Read the architecture notes ↗</a></div><div class="method-steps"><div><b>01</b><strong>Observe</strong><span>Metadata, tree, languages, manifests, commits, releases.</span></div><div><b>02</b><strong>Calculate</strong><span>Counts, ratios, age, cadence, composition, and coverage.</span></div><div><b>03</b><strong>Explain</strong><span>Every lens exposes the inputs and caveats behind it.</span></div></div></section>
+
+      <footer class="site-footer shell"><span>RepoDNA <em>by VR Developments</em></span><span>Public data only · no repository writes · <a href="SECURITY.md">security</a> · <a href="CONTRIBUTING.md">contribute</a></span></footer>
+    </section>
+  </main>
+
+  <div id="error-modal" class="modal-backdrop" hidden><div class="error-modal" role="alertdialog" aria-modal="true" aria-labelledby="error-title"><button id="close-error" class="modal-close" type="button">×</button><span class="modal-kicker">SCAN INTERRUPTED</span><h2 id="error-title">We could not read that repository.</h2><p id="error-message">—</p><div id="error-action" class="error-action"></div><button id="try-again" class="primary-button" type="button">Try another repository</button></div></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
