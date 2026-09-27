@@ -289,8 +289,8 @@ function buildAnalysis() {
   return {
     paths, rootFiles, dirs: [...dirs], maxDepth, totalBytes, fileCount: files.length, folderCount: dirs.size,
     readme, docsDir, markdownCount, testPaths, testConfig, workflowCount, ciFiles, configFiles,
-    languageEntries, languageTotal, dominantLanguage, dominantShare, commitDates, firstSampleDate, lastSampleDate, sampleDays, commitsPerWeek,
-    created, ageYears, dependencyGroups, dependencyCount, indicators, recentCommitDate, topContributorShare,
+    languageEntries, languageTotal, dominantLanguage, dominantShare, commitDates, firstSampleDate, lastSampleDate, sampleDays, commitsPerWeek, commits: state.commits,
+    created, ageYears, dependencyGroups, dependencyCount, manifestData: state.manifestData, manifests: state.manifests, indicators, recentCommitDate, topContributorShare,
     hasLicense: Boolean(repo.license?.spdx_id || paths.some(path => /^license(?:\.|$)/i.test(path.split("/").pop()))),
     tagsCount: state.tags.length, releaseCount: state.releases.length, contributorCount: state.contributors.length,
     branchCount: state.branches.length,
